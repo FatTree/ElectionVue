@@ -15,7 +15,7 @@ list.value = await getThemeList();
 <template>
   <div class="outBox">
     <header>2020 開票地圖</header>
-    <ul>
+    <ul class="nav">
       <li v-for="(item, i) in list" :key="i">
         <nuxt-link
           :to="{
@@ -23,7 +23,7 @@ list.value = await getThemeList();
             params: { id: item.id, code: item.code, type: item.type },
           }"
         >
-          {{ item.theme_name }}{{ i }}
+          {{ item.theme_name }}
         </nuxt-link>
       </li>
     </ul>
@@ -41,6 +41,9 @@ list.value = await getThemeList();
 html,
 body {
   height: 100%;
+}
+.nav {
+  display: flex;
 }
 </style>
 ~/viewModels/ElectionViewModel ~/services/ElectionService
