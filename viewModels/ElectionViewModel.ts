@@ -1,4 +1,4 @@
-import type { ProfileModel } from '~/models/ElectionModel';
+import type { PartyModel } from '~/models/ElectionModel';
 
 export type ThemeViewModel = {
   id: string;
@@ -14,17 +14,6 @@ export type ProfileViewModel = {
   formatted_vote_ticket: string;
 };
 
-
-export type partyViewModel = {
-  cand_no: number;
-  party_name: string;
-  cand_name: string;
-  ticket_percent: number;
-  ticket_num: number;
-  is_vice: string;
-  is_victor: string;
-}
-
-export type partiesDataViewModel = partyViewModel & {
-  vice_candidate: string;
-}
+export type PartyViewModel = PartyModel & {
+  vice_candidate?: string;
+};

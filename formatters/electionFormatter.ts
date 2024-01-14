@@ -2,13 +2,11 @@ import type {
   ProfileModel,
   ThemeModel,
   PartyModel,
-  PartyListModel,
 } from '~/models/ElectionModel';
 import type {
   ProfileViewModel,
   ThemeViewModel,
-  partyViewModel,
-  partiesDataViewModel,
+  PartyViewModel,
 } from '~/viewModels/ElectionViewModel';
 
 export const formatTheme = (model: ThemeModel): ThemeViewModel => {
@@ -43,66 +41,25 @@ export const formatProfile = (model: ProfileModel): ProfileViewModel => {
   };
 };
 
-export const formaterParties = (model: PartyModel): partyViewModel => {
-  const [
-    cand_no,
-    party_name,
-    cand_name,
-    ticket_percent,
-    ticket_num,
-    is_vice,
-    is_victor,
-  ] = [
-    model.cand_no,
-    model.party_name,
-    model.cand_name,
-    model.ticket_percent,
-    model.ticket_num,
-    model.is_vice,
-    model.is_victor,
-  ];
-
-  return {
-    cand_no,
-    party_name,
-    cand_name,
-    ticket_percent,
-    ticket_num,
-    is_vice,
-    is_victor,
-  };
-};
-
-const formatCandidate = (model: PartyModel): partyViewModel => ({
-  cand_no: model.cand_no,
-  party_name: model.party_name,
-  cand_name: model.cand_name,
-  ticket_percent: model.ticket_percent,
-  ticket_num: model.ticket_num,
-  is_vice: model.is_vice,
-  is_victor: model.is_victor,
-});
-
 export const groupByParty = (
-  groupByMap: Record<string, partyViewModel[]>,
+  groupByMap: Record<string, PartyViewModel[]>,
   candidate: PartyModel
-): Record<string, partyViewModel[]> => {
-  const formattedCandidate = formatCandidate(candidate);
+): Record<string, PartyViewModel[]> => {
   const keys = Object.keys(groupByMap);
-  if (keys.includes(formattedCandidate.party_name)) {
-    const target = groupByMap[formattedCandidate.party_name];
-    target.push(formattedCandidate);
+  if (keys.includes(candidate.party_name)) {
+    const target = groupByMap[candidate.party_name];
+    target.push(candidate);
   } else {
-    groupByMap[formattedCandidate.party_name] = [formattedCandidate];
+    groupByMap[candidate.party_name] = [candidate];
   }
   return groupByMap;
 };
 
 export const mergeCandidateViceCandidate = (
-  candidates: partyViewModel[]
-): partiesDataViewModel[] => {
-  const candidate = candidates.find((x) => !x.is_vice);
-  const viceCandidate = candidates.find((x) => x.is_vice);
+  candidates: PartyViewModel[]
+): PartyViewModel => {
+  const candidate = candidates.find((x) => x.is_vice !== 'Y')!;
+  const viceCandidate = candidates.find((x) => x.is_vice === 'Y')!;
   return {
     ...candidate,
     vice_candidate: viceCandidate.cand_name,
@@ -110,31 +67,26 @@ export const mergeCandidateViceCandidate = (
 };
 
 export const _groupByParty = (
-  groupList: partiesDataViewModel[],
+  groupList: PartyViewModel[],
   candidate: PartyModel
-): partiesDataViewModel[] => {
-  const formattedCandidate = formatCandidate(candidate);
-  if (formattedCandidate.is_vice) {
-    const target = groupList.find(
-      (g) => g.party_name === formattedCandidate.party_name
-    );
+): PartyViewModel[] => {
+  if (candidate.is_vice) {
+    const target = groupList.find((g) => g.party_name === candidate.party_name);
     if (target) {
-      target.vice_candidate = formattedCandidate.cand_name;
+      target.vice_candidate = candidate.cand_name;
     } else {
       groupList.push({
-        ...formattedCandidate,
-        vice_candidate: formattedCandidate.cand_name,
+        ...candidate,
+        vice_candidate: candidate.cand_name,
         cand_name: '',
       });
     }
   } else {
-    const target = groupList.find(
-      (g) => g.party_name === formattedCandidate.party_name
-    );
+    const target = groupList.find((g) => g.party_name === candidate.party_name);
     if (target) {
-      target.cand_name = formattedCandidate.cand_name;
+      target.cand_name = candidate.cand_name;
     } else {
-      groupList.push({ ...formattedCandidate, vice_candidate: '' });
+      groupList.push({ ...candidate, vice_candidate: '' });
     }
   }
 

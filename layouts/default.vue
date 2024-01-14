@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
-import { elections } from '../assets/elections';
-// import draggable from 'vuedraggable';
-import { getThemeList } from '~/services/ElectionService';
-import type { ThemeViewModel } from '~/viewModels/ElectionViewModel';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
+import { useThemeStore } from '~/stores/useThemeStore';
 
-const list = ref<ThemeViewModel[]>([]);
+const store = useThemeStore();
 
-list.value = await getThemeList();
+const { list } = storeToRefs(store);
+const { getList } = store;
+
+getList();
 </script>
 
 <template>

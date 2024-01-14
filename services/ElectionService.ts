@@ -1,17 +1,13 @@
-import {
-  formatProfile,
-  formatTheme,
-  formaterParties,
-  groupByParty,
-  mergeCandidateViceCandidate,
-} from '~/formatters/electionFormatter';
+import { formatProfile } from '~/formatters/electionFormatter';
 import type {
   ProfileListModel,
   ThemeListModel,
   PartyListModel,
   PartyModel,
+  ThemeModel,
+  AreaListModel,
+  AreaModel,
 } from '~/models/ElectionModel';
-import type { partyViewModel } from '~/viewModels/ElectionViewModel';
 
 const GET_THEME_LIST_URL = `https://db.cec.gov.tw/static/elections/list/ELC_P0.json`;
 const GET_PROFILE_LIST_PREFIX_URL = `https://db.cec.gov.tw/static/elections/data/profiles/ELC/P0/00/`;
@@ -26,11 +22,11 @@ type defaultVal = {
   code: string;
 };
 
-export const getThemeList = async () => {
+export const getThemeList = async (): Promise<ThemeModel[]> => {
   try {
     const json = await $fetch<ThemeListModel[]>(GET_THEME_LIST_URL);
     if (Array.isArray(json) && json.length > 0) {
-      return json[0].theme_items.map(formatTheme); // ???
+      return json[0].theme_items;
     }
   } catch (error) {
     console.error(error);
@@ -54,73 +50,73 @@ export const getProfileList = async (
   } catch (error) {
     console.error(error);
   }
-  return [];
 };
 
-export const getPartyList = async (
+// https://db.cec.gov.tw/static/elections/data/tickets/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/N/00_000_00_000_0000.json?_t=1705222707
+export const getPartyList = async (id: string): Promise<PartyModel[]> => {
+  const key = '00_000_00_000_0000';
+  const url = `${GET_PARTY_LIST_URL}/${id}/N/${key}.json`;
+  const res = await $fetch<PartyListModel>(url);
+  return res[key];
+};
+
+// https://db.cec.gov.tw/static/elections/data/tickets/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/C/00_000_00_000_0000.json?_t=1705222707
+export const getPartyListByCity = async (id: string): Promise<PartyModel[]> => {
+  const key = `00_000_00_000_0000`;
+  const url = `${GET_PARTY_LIST_URL}/${id}/C/${key}.json`;
+  const res = await $fetch<PartyListModel>(url);
+  return res[key];
+};
+
+// https://db.cec.gov.tw/static/elections/data/tickets/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/D/63_000_00_000_0000.json?_t=1705222707
+export const getPartyListByDistrict = async (
   id: string,
-  type: string,
-  code: string
-): Promise<partyViewModel[]> => {
-  try {
-    const url = `${GET_PARTY_LIST_URL}/${id}/${type}/${code}.json`;
-    console.log(url);
-
-    // const res = await fetch(url);  <== can't get any thing
-    // const json = await res.json;
-
-    const res = await $fetch<PartyListModel>(url);
-    // console.log(`res`, res);
-    // console.log(`code`, code);
-    // console.log(`res[code])`, res[code]);
-
-    return Object.values(res[code].reduce(groupByParty, {})).map(
-      mergeCandidateViceCandidate
-    );
-  } catch (err) {
-    console.error(err);
-  }
-  return [];
+  city: string
+): Promise<PartyModel[]> => {
+  const key = `${city}_00_000_0000`;
+  const url = `${GET_PARTY_LIST_URL}/${id}/D/${key}.json`;
+  const res = await $fetch<PartyListModel>(url);
+  return res[key];
 };
 
-export const getLiPartyList = async (
+// https://db.cec.gov.tw/static/elections/data/tickets/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/L/63_000_00_000_0000.json?_t=1705223186
+export const getPartyListByLi = async (
   id: string,
-  type: string,
-  code: string,
-  LCode: string
-): Promise<partyViewModel[]> => {
-  try {
-    const url = `${GET_PARTY_LIST_URL}/${id}/${type}/${code}.json`;
-    console.log(url);
-
-    const res: partyViewModel[] = await $fetch<PartyListModel>(url);
-
-    // const data = formaterParties([LCode]);
-    return res[LCode].reduce(groupByParty, []);
-  } catch (err) {
-    console.error(err);
-  }
-  return [];
+  city: string,
+  district: string
+): Promise<PartyModel[]> => {
+  const key = `${city}_00_000_0000`;
+  const url = `${GET_PARTY_LIST_URL}/${id}/L/${key}.json`;
+  const res = await $fetch<PartyListModel>(url);
+  return res[`${city}_${district}_0000`];
 };
 
-export const getAreaList = async (id: string, type: string, code: string) => {
-  //`${model.prv_code}_${model.city_code}_${model.area_code}_${model.dept_code}_${model.li_code}`;
-  const url = `${GET_AREA_LIST_URL}/${id}/${type}/${code}.json`;
-  const res = await $fetch(url);
-
-  return res[code];
+// https://db.cec.gov.tw/static/elections/data/areas/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/C/00_000_00_000_0000.json?_t=1705222707
+export const getAreaCityList = async (id: string): Promise<AreaModel[]> => {
+  const key = '00_000_00_000_0000';
+  const url = `${GET_AREA_LIST_URL}/${id}/C/${key}.json`;
+  const res = await $fetch<AreaListModel>(url);
+  return res[key];
 };
 
-// https://db.cec.gov.tw/static/elections/data/areas/ELC/P0/00/1f7d9f4f6bfe06fdaf4db7df2ed4d60c/L/63_000_00_000_0000.json
-
-export const getLiList = async (
+// https://db.cec.gov.tw/static/elections/data/areas/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/D/63_000_00_000_0000.json?_t=1705222707
+export const getAreaDistrictList = async (
   id: string,
-  type: string,
-  code: string,
-  LiCode: string
-) => {
-  const url = `${GET_AREA_LIST_URL}/${id}/${type}/${code}.json`;
-  // const url = 'https://db.cec.gov.tw/static/elections/data/areas/ELC/P0/00/1f7d9f4f6bfe06fdaf4db7df2ed4d60c/L/63_000_00_000_0000.json';
-  const res = await $fetch(url);
-  return res[LiCode];
+  city: string
+): Promise<AreaModel[]> => {
+  const key = `${city}_00_000_0000`;
+  const url = `${GET_AREA_LIST_URL}/${id}/D/${key}.json`;
+  const res = await $fetch<AreaListModel>(url);
+  return res[key];
+};
+
+// https://db.cec.gov.tw/static/elections/data/areas/ELC/P0/00/61b4dda0ebac3332203ef3729a9a0ada/L/63_000_00_000_0000.json?_t=1705223186
+export const getAreaLiList = async (
+  id: string,
+  city: string
+): Promise<AreaModel[]> => {
+  const key = `${city}_00_000_0000`;
+  const url = `${GET_AREA_LIST_URL}/${id}/L/${key}.json`;
+  const res = await $fetch<AreaListModel>(url);
+  return Object.values(res).flat();
 };
