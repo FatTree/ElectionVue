@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
-import { useAreaStore } from '~/stores/useAreaStore';
-import { usePartyStore } from '~/stores/usePartyStore';
-import type { ProfileViewModel } from '~/viewModels/ElectionViewModel';
+import { defineProps, ref, watch } from "vue";
+import { useAreaStore } from "~/stores/useAreaStore";
+import { usePartyStore } from "~/stores/usePartyStore";
+import type { ProfileViewModel } from "~/viewModels/ElectionViewModel";
 
 type Props = {
   id?: string;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 const props = withDefaults(defineProps<Props>(), {
-  id: '',
+  id: "",
   profile: undefined,
 });
 
@@ -29,9 +29,9 @@ const {
 const { getParties, getPartiesByCity, getPartiesByDistrict, getPartiesByLi } =
   partyStore;
 
-const selectedCity = ref(null);
-const selectedDistrict = ref(null);
-const selectedLi = ref(null);
+const selectedCity = ref();
+const selectedDistrict = ref();
+const selectedLi = ref();
 
 watch(selectedCity, async () => {
   if (selectedCity.value) {
@@ -67,36 +67,18 @@ getParties(props.id);
 
 <template>
   <div class="option">
-    <select name="pets" id="select-1" v-model="selectedCity">
-      <option disabled value="">Please select city</option>
-      <option
-        v-for="(item, index) in citySelectOptions"
-        :key="index"
-        :value="item.value"
-      >
-        {{ item.label }}
-      </option>
-    </select>
-    <select name="pets" id="select-2" v-model="selectedDistrict">
-      <option disabled :value="null">Please select area</option>
-      <option
-        v-for="(item, index) in districtSelectOptions"
-        :key="index"
-        :value="item.value"
-      >
-        {{ item.label }}
-      </option>
-    </select>
-    <select name="pets" id="select-3" v-model="selectedLi">
-      <option disabled :value="null">Please select town</option>
-      <option
-        v-for="(item, index) in liSelectOptions"
-        :key="index"
-        :value="item.value"
-      >
-        {{ item.label }}
-      </option>
-    </select>
+    <Dropdown
+      v-model:selected-value="selectedCity"
+      :options="citySelectOptions"
+    ></Dropdown>
+    <Dropdown
+      v-model:selected-value="selectedDistrict"
+      :options="districtSelectOptions"
+    ></Dropdown>
+    <Dropdown
+      v-model:selected-value="selectedLi"
+      :options="liSelectOptions"
+    ></Dropdown>
     <button>delete</button>
   </div>
   <div class="content">
@@ -136,36 +118,42 @@ getParties(props.id);
       </div>
     </div>
     <div class="city">
-      <div>
-        <h2>縣市投票結果</h2>
-        <p>city: {{ selectedCity }}</p>
-        <div class="party" v-for="(party, i) in partiesByCity">
-          <p>{{ party.cand_no }} | {{ party.party_name }}</p>
-          <p>{{ party.cand_name }} / {{ party.vice_candidate }}</p>
-          <p>{{ party.ticket_percent }}%</p>
-          <p>{{ party.ticket_num }}</p>
-        </div>
-      </div>
-      <div>
-        <h2>區投票結果</h2>
-        <p>Area: {{ selectedDistrict }}</p>
-        <div class="party" v-for="(party, i) in partiesByDistrict">
-          <p>{{ party.cand_no }} | {{ party.party_name }}</p>
-          <p>{{ party.cand_name }} / {{ party.vice_candidate }}</p>
-          <p>{{ party.ticket_percent }}%</p>
-          <p>{{ party.ticket_num }}</p>
-        </div>
-      </div>
-      <div>
-        <h2>里投票結果</h2>
-        <p>Area: {{ selectedLi }}</p>
-        <div class="party" v-for="(party, i) in partiesByLi">
-          <p>{{ party.cand_no }} | {{ party.party_name }}</p>
-          <p>{{ party.cand_name }} / {{ party.vice_candidate }}</p>
-          <p>{{ party.ticket_percent }}%</p>
-          <p>{{ party.ticket_num }}</p>
-        </div>
-      </div>
+      <Result
+        :title="'縣市投票結果'"
+        :selected-value="selectedCity"
+        :list="partiesByCity"
+      >
+        <template #default="{ item }">
+          <p>{{ item.cand_no }} | {{ item.party_name }}</p>
+          <p>{{ item.cand_name }} / {{ item.vice_candidate }}</p>
+          <p>{{ item.ticket_percent }}%</p>
+          <p>{{ item.ticket_num }}</p>
+        </template>
+      </Result>
+      <Result
+        :title="'區投票結果'"
+        :selected-value="selectedDistrict"
+        :list="partiesByDistrict"
+      >
+        <template #default="{ item }">
+          <p>{{ item.cand_no }} | {{ item.party_name }}</p>
+          <p>{{ item.cand_name }} / {{ item.vice_candidate }}</p>
+          <p>{{ item.ticket_percent }}%</p>
+          <p>{{ item.ticket_num }}</p>
+        </template>
+      </Result>
+      <Result
+        :title="'里投票結果'"
+        :selected-value="selectedLi"
+        :list="partiesByLi"
+      >
+        <template #default="{ item }">
+          <p>{{ item.cand_no }} | {{ item.party_name }}</p>
+          <p>{{ item.cand_name }} / {{ item.vice_candidate }}</p>
+          <p>{{ item.ticket_percent }}%</p>
+          <p>{{ item.ticket_num }}</p>
+        </template>
+      </Result>
       <div class="hints">
         <div class="hints__hint1">hint 1</div>
         <div class="hints__hint1">hint 2</div>

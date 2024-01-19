@@ -13,7 +13,7 @@ profile.value = await getProfileList(id, type, code);
 </script>
 
 <template>
-  <content :id="id" :profile="profile" />
+  <Content :id="id" :profile="profile" />
 </template>
 
 <style scoped></style>
