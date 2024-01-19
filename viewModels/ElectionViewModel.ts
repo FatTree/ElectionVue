@@ -1,4 +1,4 @@
-import type { PartyModel } from '~/models/ElectionModel';
+import type { PartyModel } from "~/models/ElectionModel";
 
 export type ThemeViewModel = {
   id: string;

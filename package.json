@@ -7,11 +7,20 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "vitest": "vitest",
+    "vitest:ui": "vitest --ui",
+    "vitest:run": "vitest run --coverage",
+    "vitest:debug": "vitest run --debug"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^3.10.0",
+    "@vitest/coverage-v8": "^1.2.1",
+    "@vitest/ui": "^1.2.1",
+    "@vue/test-utils": "^2.4.3",
     "nuxt": "^3.9.0",
     "unplugin-vue-components": "^0.26.0",
+    "vitest": "^1.2.1",
     "vue": "^3.4.0",
     "vue-router": "^4.2.5"
   },

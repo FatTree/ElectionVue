@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { defineProps, ref, watch } from "vue";
-import { useAreaStore } from "~/stores/useAreaStore";
+import useCity from "~/composables/useCity";
+import useDistrict from "~/composables/useDistrict";
+import useLi from "~/composables/useLi";
 import { usePartyStore } from "~/stores/usePartyStore";
 import type { ProfileViewModel } from "~/viewModels/ElectionViewModel";
 
@@ -14,52 +16,22 @@ const props = withDefaults(defineProps<Props>(), {
   profile: undefined,
 });
 
-const areaStore = useAreaStore();
-const { citySelectOptions, districtSelectOptions, liSelectOptions } =
-  storeToRefs(areaStore);
-const { getCities, getDistricts, getLis } = areaStore;
-
 const partyStore = usePartyStore();
-const {
-  list: parties,
-  listByCity: partiesByCity,
-  listByDistrict: partiesByDistrict,
-  listByLi: partiesByLi,
-} = storeToRefs(partyStore);
-const { getParties, getPartiesByCity, getPartiesByDistrict, getPartiesByLi } =
-  partyStore;
+const { list: parties } = storeToRefs(partyStore);
+const { getParties } = partyStore;
 
-const selectedCity = ref();
-const selectedDistrict = ref();
-const selectedLi = ref();
+const { selectedCity, citySelectOptions, getCities, partiesByCity } = useCity(
+  props.id
+);
 
-watch(selectedCity, async () => {
-  if (selectedCity.value) {
-    await getDistricts(props.id, selectedCity.value);
-    await getPartiesByCity(props.id);
-  }
-});
+const { selectedDistrict, districtSelectOptions, partiesByDistrict } =
+  useDistrict(props.id, selectedCity);
 
-watch(selectedDistrict, async () => {
-  if (selectedCity.value) {
-    await getLis(props.id, selectedCity.value);
-    await getPartiesByDistrict(props.id, selectedCity.value);
-  }
-});
-
-watch(selectedLi, async () => {
-  if (selectedCity.value && selectedDistrict.value) {
-    await getPartiesByLi(props.id, selectedCity.value, selectedDistrict.value);
-  }
-});
-
-watch(districtSelectOptions, () => {
-  selectedDistrict.value = null;
-});
-
-watch(liSelectOptions, () => {
-  selectedLi.value = null;
-});
+const { selectedLi, liSelectOptions, partiesByLi } = useLi(
+  props.id,
+  selectedCity,
+  selectedDistrict
+);
 
 getCities(props.id);
 getParties(props.id);

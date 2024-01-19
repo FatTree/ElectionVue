@@ -2,12 +2,12 @@ import type {
   ProfileModel,
   ThemeModel,
   PartyModel,
-} from '~/models/ElectionModel';
+} from "~/models/ElectionModel";
 import type {
   ProfileViewModel,
   ThemeViewModel,
   PartyViewModel,
-} from '~/viewModels/ElectionViewModel';
+} from "~/viewModels/ElectionViewModel";
 
 export const formatTheme = (model: ThemeModel): ThemeViewModel => {
   const id = model.theme_id;
@@ -22,22 +22,20 @@ export const formatTheme = (model: ThemeModel): ThemeViewModel => {
  * @param model
  * @returns
  */
-export const formatCode = (model: ProfileModel) => {
-  const code = `${model.prv_code}_${model.city_code}_${model.area_code}_${model.dept_code}_${model.li_code}`;
-  const prv_code: string = model.prv_code;
-  const city_code: string = model.city_code;
-  const area_code: string = model.area_code;
-  const dept_code: string = model.dept_code;
-  const li_code: string = model.li_code;
-  return { code, prv_code, city_code, area_code, dept_code, li_code };
-};
+export const formatCode = ({
+  prv_code,
+  city_code,
+  area_code,
+  dept_code,
+  li_code,
+}: ProfileModel) => ({ prv_code, city_code, area_code, dept_code, li_code });
 
 export const formatProfile = (model: ProfileModel): ProfileViewModel => {
   return {
     ...model,
-    formatted_valid_ticket: model.valid_ticket.toLocaleString('en-US'),
-    formatted_invalid_ticket: model.invalid_ticket.toLocaleString('en-US'),
-    formatted_vote_ticket: model.vote_ticket.toLocaleString('en-US'),
+    formatted_valid_ticket: model.valid_ticket.toLocaleString("en-US"),
+    formatted_invalid_ticket: model.invalid_ticket.toLocaleString("en-US"),
+    formatted_vote_ticket: model.vote_ticket.toLocaleString("en-US"),
   };
 };
 
@@ -58,8 +56,8 @@ export const groupByParty = (
 export const mergeCandidateViceCandidate = (
   candidates: PartyViewModel[]
 ): PartyViewModel => {
-  const candidate = candidates.find((x) => x.is_vice !== 'Y')!;
-  const viceCandidate = candidates.find((x) => x.is_vice === 'Y')!;
+  const candidate = candidates.find((x) => x.is_vice !== "Y")!;
+  const viceCandidate = candidates.find((x) => x.is_vice === "Y")!;
   return {
     ...candidate,
     vice_candidate: viceCandidate.cand_name,
@@ -78,7 +76,7 @@ export const _groupByParty = (
       groupList.push({
         ...candidate,
         vice_candidate: candidate.cand_name,
-        cand_name: '',
+        cand_name: "",
       });
     }
   } else {
@@ -86,7 +84,7 @@ export const _groupByParty = (
     if (target) {
       target.cand_name = candidate.cand_name;
     } else {
-      groupList.push({ ...candidate, vice_candidate: '' });
+      groupList.push({ ...candidate, vice_candidate: "" });
     }
   }
 

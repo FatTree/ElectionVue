@@ -1,15 +1,18 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { AreaModel } from '~/models/ElectionModel';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { AreaModel } from "~/models/ElectionModel";
 import {
   getAreaCityList as getCityListAPI,
   getAreaDistrictList as getDistrictListAPI,
   getAreaLiList as getLiListAPI,
-} from '~/services/ElectionService';
+} from "~/services/ElectionService";
 
-const storeName = 'area';
+const storeName = "area";
 
 export const useAreaStore = defineStore(storeName, () => {
+  /**
+   * for raw data
+   */
   const cities = ref<AreaModel[]>([]);
   const districts = ref<AreaModel[]>([]);
   const lis = ref<AreaModel[]>([]);
@@ -29,14 +32,15 @@ export const useAreaStore = defineStore(storeName, () => {
     value: model.li_code,
   });
 
+  /**
+   * for view data
+   */
   const citySelectOptions = computed(() =>
     cities.value.map(formatCitySelectOption)
   );
-
   const districtSelectOptions = computed(() =>
     districts.value.map(formatDistrictSelectOption)
   );
-
   const liSelectOptions = computed(() => lis.value.map(formatLiSelectOption));
 
   const getCities = async (id: string) => {
